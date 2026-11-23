@@ -5,7 +5,7 @@
 //  Created by Taci Öztürk on 23.11.2026.
 //
 
-public struct Entity {
+public struct Entity: Equatable, Hashable, Codable {
     public var id: UInt32
     public var generation: UInt32
 }
