@@ -10,13 +10,13 @@ let INVALID_SLOT = UInt32.max
 public protocol Component {}
 
 public struct ComponentStore {
-	public var components: ContiguousArray<Component> = []
-    public var changed: ContiguousArray<UInt64> = []
-    public var entities: ContiguousArray<Entity> = []
-    public var sparse: ContiguousArray<UInt32> = []
-    public var clock: UInt64? = 0 // worlds change tick, needs passing
+	private var components: ContiguousArray<Component> = []
+    private var changed: ContiguousArray<UInt64> = []
+    private var entities: ContiguousArray<Entity> = []
+    private var sparse: ContiguousArray<UInt32> = []
+    private var clock: UInt64? = 0 // worlds change tick, needs passing
 
-    public mutating func add(_ entity: Entity, _ component: Component) {
+    package mutating func add(_ entity: Entity, _ component: Component) {
         let id = Int(entity.id)
         while sparse.count <= entity.id {
             sparse.append(INVALID_SLOT)
@@ -36,7 +36,7 @@ public struct ComponentStore {
         entities.append(entity)
     }
 
-    public func has(_ entity: Entity) -> Bool {
+    package func has(_ entity: Entity) -> Bool {
         if entity.id > sparse.count {
             return false
         }
@@ -46,13 +46,13 @@ public struct ComponentStore {
         return slot != INVALID_SLOT && entities[slot] == entity
     }
 
-    public func get(_ entity: Entity) -> Component? {
+    package func get(_ entity: Entity) -> Component? {
         guard has(entity) else { return nil }
 
         return components[Int(sparse[Int(entity.id)])]
     }
 
-    public mutating func remove(_ entity: Entity) {
+    package mutating func remove(_ entity: Entity) {
         guard has(entity) else { return }
 
         let id = Int(entity.id)

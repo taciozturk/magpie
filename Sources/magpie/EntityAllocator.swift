@@ -12,10 +12,10 @@ public struct Entity: Equatable, Hashable, Codable {
 
 
 public class EntityAllocator {
-    public var generations: ContiguousArray<UInt32> = []
-    public var freeList: ContiguousArray<UInt32> = []
+    private var generations: ContiguousArray<UInt32> = []
+    private var freeList: ContiguousArray<UInt32> = []
 
-    public func create() -> Entity {
+    package func create() -> Entity {
         if let index = freeList.popLast() {
             return Entity(id: index, generation: generations[Int(index)])
         }
@@ -25,8 +25,8 @@ public class EntityAllocator {
         return Entity(id: index, generation: 1)
     }
 
-    public func destroy(_ entity: Entity) -> Bool {
-        if !is_alive(entity) {
+    package func destroy(_ entity: Entity) -> Bool {
+        if !isAlive(entity) {
             return false
         }
 
@@ -40,7 +40,7 @@ public class EntityAllocator {
         return true
     }
 
-    public func is_alive(_ entity: Entity) -> Bool {
+    package func isAlive(_ entity: Entity) -> Bool {
         return entity.id < UInt32(generations.count) && generations[Int(entity.id)] == entity.generation
     }
 }
