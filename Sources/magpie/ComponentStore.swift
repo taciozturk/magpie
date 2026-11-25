@@ -9,14 +9,14 @@ let INVALID_SLOT = UInt32.max
 
 public protocol Component {}
 
-public struct ComponentStore {
-	private var components: ContiguousArray<Component> = []
-    private var changed: ContiguousArray<UInt64> = []
-    private var entities: ContiguousArray<Entity> = []
-    private var sparse: ContiguousArray<UInt32> = []
-    private var clock: UInt64? = 0 // worlds change tick, needs passing
+public class ComponentStore {
+	package var components: ContiguousArray<Component> = []
+    package var changed: ContiguousArray<UInt64> = []
+    package var entities: ContiguousArray<Entity> = []
+    package var sparse: ContiguousArray<UInt32> = []
+    package var clock: UInt64? = 0 // worlds change tick, needs passing
 
-    package mutating func add(_ entity: Entity, _ component: Component) {
+    package func add(_ entity: Entity, _ component: Component) {
         let id = Int(entity.id)
         while sparse.count <= entity.id {
             sparse.append(INVALID_SLOT)
@@ -34,10 +34,11 @@ public struct ComponentStore {
         components.append(component)
         changed.append(now())
         entities.append(entity)
+        print("added component. sparse size: \(sparse.count)")
     }
 
     package func has(_ entity: Entity) -> Bool {
-        if entity.id > sparse.count {
+        if entity.id >= sparse.count {
             return false
         }
 
@@ -52,7 +53,7 @@ public struct ComponentStore {
         return components[Int(sparse[Int(entity.id)])]
     }
 
-    package mutating func remove(_ entity: Entity) {
+    package func remove(_ entity: Entity) {
         guard has(entity) else { return }
 
         let id = Int(entity.id)
@@ -62,12 +63,15 @@ public struct ComponentStore {
         if slot != last {
             entities[slot] = entities[last]
             components[slot] = components[last]
+            changed[slot] = changed[last]
             sparse[Int(entities[slot].id)] = UInt32(slot) // swap the index of last with the index of removed slot
         }
 
         entities.removeLast()
         components.removeLast()
+        changed.removeLast()
         sparse[id] = INVALID_SLOT
+        print("removed component. sparse size: \(sparse.count)")
     }
 
     private func now() -> UInt64 {

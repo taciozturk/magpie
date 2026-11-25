@@ -11,12 +11,18 @@ public final class World {
     public var stores: [ObjectIdentifier:ComponentStore] = [:]
     public var clock: UInt64 = 1
 
+    private init() {}
+
+    public static func create() -> World {
+        return World()
+    }
+
     public func spawn() -> Entity {
         let e = entities.create()
         return e
     }
 
-    public func is_alive(_ entity: Entity) -> Bool {
+    public func isAlive(_ entity: Entity) -> Bool {
         return entities.isAlive(entity)
     }
 
@@ -46,8 +52,8 @@ public final class World {
                     stores[componentType]?.remove(entity)
                 case .destroyEntity(let entity):
                     let _ = entities.destroy(entity)
-            }
-
+        	}
         }
+        commandBuffer.commands.removeAll(keepingCapacity: true)
     }
 }

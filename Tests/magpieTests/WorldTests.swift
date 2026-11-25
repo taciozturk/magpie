@@ -1,0 +1,86 @@
+//
+//  WorldTests.swift
+//  magpie
+//
+//  Created by Taci Öztürk on 25.11.2026.
+//
+
+import Testing
+@testable import magpie
+
+struct Position: Component {
+    var x: Int
+    var y: Int
+
+    init(_ x: Int, _ y: Int) {
+        self.x = x
+        self.y = y
+    }
+}
+struct CommandBufferTests {
+
+    @Test("Queue command create")
+    func queueCommandCreate() {
+        let world = World.create()
+        let e = world.spawn()
+
+        #expect(world.commandBuffer.commands.count == 0)
+        world.queue(.addComponent(e, Position(1,1)))
+        #expect(world.commandBuffer.commands.count == 1)
+    }
+
+    @Test("Spawn and queue command destroy then flush")
+    func queueDestroy() {
+        let world = World.create()
+        let e = world.spawn()
+
+        world.queue(.destroyEntity(e))
+        world.flush()
+
+        #expect(world.isAlive(e) == false)
+    }
+
+    @Test("Queue command add component")
+    func addComponent() {
+        let world = World.create()
+        let e = world.spawn()
+        world.register(storeOf: ObjectIdentifier(Position.self))
+
+        world.queue(.addComponent(e, Position(1,1)))
+        world.flush()
+        #expect(world.commandBuffer.commands.count == 0)
+
+        let ok = world.isAlive(e)
+        #expect(ok == true)
+
+        let posStore = world.store(of: ObjectIdentifier(Position.self))
+
+        #expect(posStore.has(e))
+
+        if let pos = posStore.get(e) as? Position {
+            #expect(pos.x == 1)
+            #expect(pos.y == 1)
+        }
+    }
+
+    @Test("Queue command add component then remove")
+    func removeComponent() {
+        let world = World.create()
+        let e = world.spawn()
+        print(e.id)
+
+        world.register(storeOf: ObjectIdentifier(Position.self))
+
+        let posStore = world.store(of: ObjectIdentifier(Position.self))
+
+        print(posStore.sparse.count)
+        world.queue(.addComponent(e, Position(1,1)))
+        world.queue(.removeComponent(e, ObjectIdentifier(Position.self)))
+        world.flush()
+
+        #expect(!posStore.has(e))
+    }
+
+}
+
+

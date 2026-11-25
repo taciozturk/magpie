@@ -12,7 +12,7 @@ public enum Command {
 }
 
 public struct CommandBuffer {
-    private var commands = ContiguousArray<Command>()
+    package var commands = ContiguousArray<Command>()
 
     package mutating func queue(_ command: Command) {
         commands.append(command)

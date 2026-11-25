@@ -12,8 +12,8 @@ public struct Entity: Equatable, Hashable, Codable {
 
 
 public class EntityAllocator {
-    private var generations: ContiguousArray<UInt32> = []
-    private var freeList: ContiguousArray<UInt32> = []
+    package var generations: ContiguousArray<UInt32> = []
+    package var freeList: ContiguousArray<UInt32> = []
 
     package func create() -> Entity {
         if let index = freeList.popLast() {

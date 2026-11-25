@@ -39,7 +39,7 @@ struct EntityTests {
         let ea = EntityAllocator()
         let e = Entity(id: 1, generation: 1)
         let _ = ea.destroy(e)
-        #expect(!ea.is_alive(e))
+        #expect(!ea.isAlive(e))
     }
 
     @Test("Create destroy create, same id different generation")
@@ -71,7 +71,7 @@ struct EntityTests {
         let ea = EntityAllocator()
         let e = Entity(id: 0, generation: 0)
 
-        #expect(!ea.is_alive(e))
+        #expect(!ea.isAlive(e))
     }
 
     @Test("Entity out of range is not alive and does not crash")
@@ -83,7 +83,7 @@ struct EntityTests {
 
         let e = Entity(id: 10, generation: 1)
 
-        #expect(!ea.is_alive(e))
+        #expect(!ea.isAlive(e))
     }
 
 }
