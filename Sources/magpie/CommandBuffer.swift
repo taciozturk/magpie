@@ -11,7 +11,7 @@ public enum Command {
     case removeComponent
 }
 
-public struct CommandBuffer<T> {
+public struct CommandBuffer {
     var commands = ContiguousArray<Command>()
 
     public mutating func queue(_ command: Command) {
