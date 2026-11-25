@@ -6,9 +6,9 @@
 //
 
 public enum Command {
-    case destroyEntity
-    case addComponent
-    case removeComponent
+    case destroyEntity(_ entity: Entity)
+    case addComponent(_ entity: Entity, _ component: Component)
+    case removeComponent(_ entity: Entity, _ component: ObjectIdentifier)
 }
 
 public struct CommandBuffer {

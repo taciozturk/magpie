@@ -7,14 +7,16 @@
 
 let INVALID_SLOT = UInt32.max
 
-public struct ComponentStore<T> {
-	public var components: ContiguousArray<T> = []
+public protocol Component {}
+
+public struct ComponentStore {
+	public var components: ContiguousArray<Component> = []
     public var changed: ContiguousArray<UInt64> = []
     public var entities: ContiguousArray<Entity> = []
     public var sparse: ContiguousArray<UInt32> = []
     public var clock: UInt64? = 0 // worlds change tick, needs passing
 
-    public mutating func add(_ entity: Entity, _ component: T) {
+    public mutating func add(_ entity: Entity, _ component: Component) {
         let id = Int(entity.id)
         while sparse.count <= entity.id {
             sparse.append(INVALID_SLOT)
@@ -44,7 +46,7 @@ public struct ComponentStore<T> {
         return slot != INVALID_SLOT && entities[slot] == entity
     }
 
-    public func get(_ entity: Entity) -> T? {
+    public func get(_ entity: Entity) -> Component? {
         guard has(entity) else { return nil }
 
         return components[Int(sparse[Int(entity.id)])]
