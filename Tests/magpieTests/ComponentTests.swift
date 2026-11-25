@@ -22,9 +22,9 @@ struct ComponentTests {
         let e3 = ea.create()
 
         var store = ComponentStore<Transform>()
-        store.add(e: e1, c: Transform(x: 1, y: 1))
-        store.add(e: e2, c: Transform(x: 2, y: 2))
-        store.add(e: e3, c: Transform(x: 3, y: 3))
+        store.add(e1, Transform(x: 1, y: 1))
+        store.add(e2, Transform(x: 2, y: 2))
+        store.add(e3, Transform(x: 3, y: 3))
 
         #expect(store.components[Int(store.sparse[Int(e1.id)])].x == 1)
         #expect(store.components[Int(store.sparse[Int(e2.id)])].x == 2)

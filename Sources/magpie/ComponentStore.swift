@@ -14,46 +14,47 @@ public struct ComponentStore<T> {
     public var sparse: ContiguousArray<UInt32> = []
     public var clock: UInt64? = 0 // worlds change tick, needs passing
 
-    subscript(_ e: Entity) -> T {
-        get { components[Int(sparse[Int(e.id)])] }
-        set { components[Int(sparse[Int(e.id)])] = newValue }
-    }
-
-    public mutating func add(e: Entity, c: T) {
-        let id = Int(e.id)
-        while sparse.count <= e.id {
+    public mutating func add(_ entity: Entity, _ component: T) {
+        let id = Int(entity.id)
+        while sparse.count <= entity.id {
             sparse.append(INVALID_SLOT)
         }
 
         let slot = sparse[id]
         if slot != INVALID_SLOT {
-            assert(entities[Int(slot)] == e, "stale entity still owns a component slot")
-            components[Int(slot)] = c
+            assert(entities[Int(slot)] == entity, "stale entity still owns a component slot")
+            components[Int(slot)] = component
             changed[Int(slot)] = now()
             return
         }
 
         sparse[id] = UInt32(entities.count)
-        components.append(c)
+        components.append(component)
         changed.append(now())
-        entities.append(e)
+        entities.append(entity)
     }
 
-    public func has(e: Entity) -> Bool {
-        if e.id > sparse.count {
+    public func has(_ entity: Entity) -> Bool {
+        if entity.id > sparse.count {
             return false
         }
 
-        let slot = Int(sparse[Int(e.id)])
+        let slot = Int(sparse[Int(entity.id)])
 
-        return slot != INVALID_SLOT && entities[slot] == e
+        return slot != INVALID_SLOT && entities[slot] == entity
     }
 
-    public mutating func remove(e: Entity) {
-        guard has(e: e) else { return }
+    public func get(_ entity: Entity) -> T? {
+        guard has(entity) else { return nil }
 
-        let id = Int(e.id)
-        let slot = Int(sparse[Int(e.id)])
+        return components[Int(sparse[Int(entity.id)])]
+    }
+
+    public mutating func remove(_ entity: Entity) {
+        guard has(entity) else { return }
+
+        let id = Int(entity.id)
+        let slot = Int(sparse[Int(entity.id)])
         let last = entities.count - 1
 
         if slot != last {
@@ -66,13 +67,6 @@ public struct ComponentStore<T> {
         components.removeLast()
         sparse[id] = INVALID_SLOT
     }
-
-    public func get(e: Entity) -> Entity? {
-        guard has(e: e) else { return nil }
-
-        return entities[Int(sparse[Int(e.id)])]
-    }
-
 
     private func now() -> UInt64 {
         return clock ?? 0

@@ -25,22 +25,22 @@ public class EntityAllocator {
         return Entity(id: index, generation: 1)
     }
 
-    public func destroy(e: Entity) -> Bool {
-        if !is_alive(e: e) {
+    public func destroy(_ entity: Entity) -> Bool {
+        if !is_alive(entity) {
             return false
         }
 
-        var gen = generations[Int(e.id)] + 1
+        var gen = generations[Int(entity.id)] + 1
         if gen == 0 {
             gen = 1
         }
 
-        generations[Int(e.id)] = gen
-        freeList.append(e.id)
+        generations[Int(entity.id)] = gen
+        freeList.append(entity.id)
         return true
     }
 
-    public func is_alive(e: Entity) -> Bool {
-        return e.id < UInt32(generations.count) && generations[Int(e.id)] == e.generation
+    public func is_alive(_ entity: Entity) -> Bool {
+        return entity.id < UInt32(generations.count) && generations[Int(entity.id)] == entity.generation
     }
 }
