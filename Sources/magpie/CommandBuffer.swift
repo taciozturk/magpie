@@ -6,15 +6,19 @@
 //
 
 public enum Command {
-    case destroyEntity(_ entity: Entity)
-    case addComponent(_ entity: Entity, _ component: Component)
-    case removeComponent(_ entity: Entity, _ component: ObjectIdentifier)
+    case destroyEntity(Entity)
+    case addComponent(Entity, any Component)
+    case removeComponent(Entity, ObjectIdentifier)
 }
 
 public struct CommandBuffer {
-    package var commands = ContiguousArray<Command>()
+    package private(set) var commands = ContiguousArray<Command>()
 
     package mutating func queue(_ command: Command) {
         commands.append(command)
+    }
+
+    package mutating func clear() {
+        commands.removeAll(keepingCapacity: true)
     }
 }

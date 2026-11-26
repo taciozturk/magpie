@@ -44,7 +44,7 @@ struct CommandBufferTests {
     func addComponent() {
         let world = World.create()
         let e = world.spawn()
-        world.register(storeOf: ObjectIdentifier(Position.self))
+        let posStore = world.register(storeOf: Position.self)
 
         world.queue(.addComponent(e, Position(1,1)))
         world.flush()
@@ -53,11 +53,10 @@ struct CommandBufferTests {
         let ok = world.isAlive(e)
         #expect(ok == true)
 
-        let posStore = world.store(of: ObjectIdentifier(Position.self))
 
         #expect(posStore.has(e))
 
-        if let pos = posStore.get(e) as? Position {
+        if let pos = posStore.get(e) {
             #expect(pos.x == 1)
             #expect(pos.y == 1)
         }
@@ -69,9 +68,7 @@ struct CommandBufferTests {
         let e = world.spawn()
         print(e.id)
 
-        world.register(storeOf: ObjectIdentifier(Position.self))
-
-        let posStore = world.store(of: ObjectIdentifier(Position.self))
+        let posStore = world.register(storeOf: Position.self)
 
         print(posStore.sparse.count)
         world.queue(.addComponent(e, Position(1,1)))

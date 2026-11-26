@@ -6,10 +6,10 @@
 //
 
 public final class World {
-    public var entities = EntityAllocator()
-    public var commandBuffer = CommandBuffer()
-    public var stores: [ObjectIdentifier:ComponentStore] = [:]
-    public var clock: UInt64 = 1
+    package var clock = Clock()
+    package var entities = EntityAllocator()
+    package var stores: [ObjectIdentifier: any AnyComponentStore] = [:]
+    package var commandBuffer = CommandBuffer()
 
     private init() {}
 
@@ -26,17 +26,21 @@ public final class World {
         return entities.isAlive(entity)
     }
 
-    public func register(storeOf componentType: ObjectIdentifier) {
-        if stores[componentType] == nil {
-            stores[componentType] = ComponentStore()
-        } else {
-            return
-        }
+    public func register<T: Component>(storeOf componentType: T.Type) -> ComponentStore<T> {
+        let key = ObjectIdentifier(T.self)
+        precondition(stores[key] == nil, "component registered twice")
+        let store = ComponentStore<T>(clock: clock)
+        stores[key] = store
+        return store
     }
 
-    public func store(of componentType: ObjectIdentifier) -> ComponentStore {
-        precondition(stores[componentType] != nil)
-        return stores[componentType]!
+    // since we derive the key to the store dictionary from the type of the component
+    // we need to downcast the store to the concrete component type
+    public func store<T: Component>(of componentType: T.Type) -> ComponentStore<T> {
+        guard let s = stores[ObjectIdentifier(T.self)] else {
+            preconditionFailure("component type not registered")
+        }
+        return unsafeDowncast(s, to: ComponentStore<T>.self)
     }
 
     public func queue(_ command: Command) {
@@ -47,13 +51,18 @@ public final class World {
         for cmd in commandBuffer.commands {
             switch cmd {
                 case .addComponent(let entity, let component):
-                    stores[ObjectIdentifier(type(of: component))]?.add(entity, component)
+                    // we use a helper function to pass the concrete component to the command buffer
+                    addComponent(entity, component)
                 case .removeComponent(let entity, let componentType):
                     stores[componentType]?.remove(entity)
                 case .destroyEntity(let entity):
                     let _ = entities.destroy(entity)
         	}
         }
-        commandBuffer.commands.removeAll(keepingCapacity: true)
+        commandBuffer.clear()
+    }
+
+    private func addComponent<C: Component>(_ entity: Entity, _ component: C) {
+        store(of: C.self).add(entity, component)
     }
 }

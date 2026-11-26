@@ -9,14 +9,31 @@ let INVALID_SLOT = UInt32.max
 
 public protocol Component {}
 
-public class ComponentStore {
-	package var components: ContiguousArray<Component> = []
+// AnyComponentStore conforms to AnyObject so we can downcast it to the concrete type
+// e.g. ComponentStore<T> becomes ComponentStore<Position>.
+package protocol AnyComponentStore: AnyObject {
+    var entities: ContiguousArray<Entity> { get }
+    func has(_ entity: Entity) -> Bool
+    func remove(_ entity: Entity)
+    func changed(_ entity: Entity, since: UInt64) -> Bool
+}
+
+public final class Clock {
+    package var now: UInt64 = 1
+}
+
+public class ComponentStore<T: Component>: AnyComponentStore {
+	package var components: ContiguousArray<T> = []
     package var changed: ContiguousArray<UInt64> = []
     package var entities: ContiguousArray<Entity> = []
     package var sparse: ContiguousArray<UInt32> = []
-    package var clock: UInt64? = 0 // worlds change tick, needs passing
+    package var clock: Clock // worlds change tick, needs passing
 
-    package func add(_ entity: Entity, _ component: Component) {
+    package init(clock: Clock) {
+    	self.clock = clock
+    }
+
+    package func add(_ entity: Entity, _ component: T) {
         let id = Int(entity.id)
         while sparse.count <= entity.id {
             sparse.append(INVALID_SLOT)
@@ -26,13 +43,13 @@ public class ComponentStore {
         if slot != INVALID_SLOT {
             assert(entities[Int(slot)] == entity, "stale entity still owns a component slot")
             components[Int(slot)] = component
-            changed[Int(slot)] = now()
+            changed[Int(slot)] = clock.now
             return
         }
 
         sparse[id] = UInt32(entities.count)
         components.append(component)
-        changed.append(now())
+        changed.append(clock.now)
         entities.append(entity)
         print("added component. sparse size: \(sparse.count)")
     }
@@ -47,10 +64,34 @@ public class ComponentStore {
         return slot != INVALID_SLOT && entities[slot] == entity
     }
 
-    package func get(_ entity: Entity) -> Component? {
+    package func get(_ entity: Entity) -> T? {
         guard has(entity) else { return nil }
 
         return components[Int(sparse[Int(entity.id)])]
+    }
+
+    // mutate the component in place while calling from world
+    package func modify(_ entity: Entity, _ body: (inout T) -> Void) {
+        guard has(entity) else { return }
+        let slot = Int(sparse[Int(entity.id)])
+        changed[slot] = clock.now
+        body(&components[slot])
+    }
+
+    // readonly access to component. second generic R means we can call it from world and look inside
+    // T: Component, R: the type of property of the component
+    // let transform be the component
+    // Transform {
+    //	x: Float
+    //	y: Float
+    // }
+    // calling the read and the closure body:
+    // let x: Float? = store.read(e) { $0.x }
+    // or
+    // let x: Float? = store.read(e) { component in component.x }
+    package func read<R>(_ e: Entity, _ body: (borrowing T) -> R) -> R? {
+        guard has(e) else { return nil }
+        return body(components[Int(sparse[Int(e.id)])])
     }
 
     package func remove(_ entity: Entity) {
@@ -74,8 +115,8 @@ public class ComponentStore {
         print("removed component. sparse size: \(sparse.count)")
     }
 
-    private func now() -> UInt64 {
-        return clock ?? 0
+    package func changed(_ entity: Entity, since: UInt64) -> Bool {
+        has(entity) && changed[Int(sparse[Int(entity.id)])] > since
     }
 
 }
