@@ -22,6 +22,18 @@ public final class World {
         return e
     }
 
+    public func despawn(entity: Entity) {
+        if isAlive(entity) {
+            for store in stores.values {
+                if store.has(entity) {
+                    store.remove(entity)
+                }
+            }
+        }
+
+        let _ = entities.destroy(entity)
+    }
+
     public func isAlive(_ entity: Entity) -> Bool {
         return entities.isAlive(entity)
     }
@@ -56,7 +68,7 @@ public final class World {
                 case .removeComponent(let entity, let componentType):
                     stores[componentType]?.remove(entity)
                 case .destroyEntity(let entity):
-                    let _ = entities.destroy(entity)
+                    despawn(entity: entity)
         	}
         }
         commandBuffer.clear()
