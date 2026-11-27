@@ -30,11 +30,12 @@ public class EntityAllocator {
             return false
         }
 
-        var gen = generations[Int(entity.id)] + 1
+
+        var gen = generations[Int(entity.id)]
+        gen &+= 1 // & to wrap if overflows
         if gen == 0 {
             gen = 1
         }
-
         generations[Int(entity.id)] = gen
         freeList.append(entity.id)
         return true

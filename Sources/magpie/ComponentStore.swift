@@ -22,7 +22,7 @@ public final class Clock {
     package var now: UInt64 = 1
 }
 
-public class ComponentStore<T: Component>: AnyComponentStore {
+public final class ComponentStore<T: Component>: AnyComponentStore {
 	package var components: ContiguousArray<T> = []
     package var changed: ContiguousArray<UInt64> = []
     package var entities: ContiguousArray<Entity> = []
@@ -35,8 +35,9 @@ public class ComponentStore<T: Component>: AnyComponentStore {
 
     package func add(_ entity: Entity, _ component: T) {
         let id = Int(entity.id)
-        while sparse.count <= entity.id {
-            sparse.append(INVALID_SLOT)
+
+        if sparse.count <= entity.id {
+            sparse.append(contentsOf: repeatElement(INVALID_SLOT, count: id + 1 - sparse.count))
         }
 
         let slot = sparse[id]
@@ -51,7 +52,6 @@ public class ComponentStore<T: Component>: AnyComponentStore {
         components.append(component)
         changed.append(clock.now)
         entities.append(entity)
-        print("added component. sparse size: \(sparse.count)")
     }
 
     package func has(_ entity: Entity) -> Bool {
@@ -112,7 +112,6 @@ public class ComponentStore<T: Component>: AnyComponentStore {
         components.removeLast()
         changed.removeLast()
         sparse[id] = INVALID_SLOT
-        print("removed component. sparse size: \(sparse.count)")
     }
 
     package func changed(_ entity: Entity, since: UInt64) -> Bool {

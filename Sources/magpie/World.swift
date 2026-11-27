@@ -31,7 +31,7 @@ public final class World {
             }
         }
 
-        let _ = entities.destroy(entity)
+        _ = entities.destroy(entity)
     }
 
     public func isAlive(_ entity: Entity) -> Bool {
@@ -64,6 +64,7 @@ public final class World {
             switch cmd {
                 case .addComponent(let entity, let component):
                     // we use a helper function to pass the concrete component to the command buffer
+                    guard entities.isAlive(entity) else { continue }
                     addComponent(entity, component)
                 case .removeComponent(let entity, let componentType):
                     stores[componentType]?.remove(entity)
