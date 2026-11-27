@@ -6,12 +6,12 @@
 //
 
 public struct Entity: Equatable, Hashable, Codable {
-    public var id: UInt32
-    public var generation: UInt32
+    public let id: UInt32
+    public let generation: UInt32
 }
 
 
-public class EntityAllocator {
+public final class EntityAllocator {
     package var generations: ContiguousArray<UInt32> = []
     package var freeList: ContiguousArray<UInt32> = []
 
@@ -25,6 +25,8 @@ public class EntityAllocator {
         return Entity(id: index, generation: 1)
     }
 
+    // make this discardable to prevent handling bool return in every usage "_ =" vice versa
+    @discardableResult
     package func destroy(_ entity: Entity) -> Bool {
         if !isAlive(entity) {
             return false

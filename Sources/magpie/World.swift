@@ -6,8 +6,8 @@
 //
 
 public final class World {
-    package var clock = Clock()
-    package var entities = EntityAllocator()
+    package let clock = Clock()
+    package let entities = EntityAllocator()
     package var stores: [ObjectIdentifier: any AnyComponentStore] = [:]
     package var commandBuffer = CommandBuffer()
 
@@ -38,6 +38,7 @@ public final class World {
         return entities.isAlive(entity)
     }
 
+    @discardableResult
     public func register<T: Component>(storeOf componentType: T.Type) -> ComponentStore<T> {
         let key = ObjectIdentifier(T.self)
         precondition(stores[key] == nil, "component registered twice")
@@ -70,7 +71,7 @@ public final class World {
                     stores[componentType]?.remove(entity)
                 case .destroyEntity(let entity):
                     despawn(entity: entity)
-        	}
+            }
         }
         commandBuffer.clear()
     }
