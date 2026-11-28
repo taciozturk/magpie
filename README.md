@@ -31,8 +31,6 @@ magpie is a personal project where i try to implement a **lightweight ECS packag
 
 #### Vector and Matrix Ops
 *for storing and transforming component data*
->****[!CAUTION]
-> not implemented
 
 
 
