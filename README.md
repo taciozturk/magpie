@@ -4,31 +4,34 @@ magpie is a personal project where i try to implement a **lightweight ECS packag
 
 ## Package
 #### World
+*top level container*
 #### EntityAllocator and Entities
+*entities with generation*
 #### ComponentStore and Components
+*type erased generic store*s
 #### CommandBuffer and Commands
-#### Query Engine
+*delayed store commands to prevent array resizing during iteration*
+#### ****Query Engine
+*parameter pack iteration(Swift 6.0+)* 
+
 >[!CAUTION]
 > not implemented
-
 #### System Scheduler
 
->[!CAUTION]
-> not implemented
 
-#### EventQueue and Events
-
+#### EventBus and Events
+*message queue for system communication*
 >[!CAUTION]
 > not implemented
 
 #### Pseudorandom Number Generator (SplitMix64)
-
+*fast prng for seeding*
 >[!CAUTION]
 > not implemented
 
 #### Vector and Matrix Ops
-
->[!CAUTION]
+*for storing and transforming component data*
+>****[!CAUTION]
 > not implemented
 
 
