@@ -9,6 +9,10 @@ public enum Command {
     case destroyEntity(Entity)
     case addComponent(Entity, any Component)
     case removeComponent(Entity, ObjectIdentifier)
+
+    static func removeComponent<C: Component>(_ entity: Entity, _ type: C.Type) -> Command {
+        .removeComponent(entity, ObjectIdentifier(C.self))
+    }
 }
 
 public struct CommandBuffer {

@@ -11,11 +11,14 @@ public final class World {
     package let entities = EntityAllocator()
     package var stores: [ObjectIdentifier: any AnyComponentStore] = [:]
     package var commandBuffer = CommandBuffer()
+    package let rng: Rng
 
-    private init() {}
+    private init(_ seed: UInt64) {
+		rng = Rng(seed: seed)
+    }
 
-    public static func create() -> World {
-        return World()
+    public static func create(seed: UInt64 = 3342) -> World {
+        return World(seed)
     }
 
     public func spawn() -> Entity {
@@ -84,4 +87,5 @@ public final class World {
     private func addComponent<C: Component>(_ entity: Entity, _ component: C) {
         store(of: C.self).add(entity, component)
     }
+
 }
