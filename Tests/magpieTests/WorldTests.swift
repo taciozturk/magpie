@@ -9,16 +9,17 @@ import Testing
 @testable import magpie
 
 struct Position: Component {
-    var x: Int
-    var y: Int
+    var x: Float
+    var y: Float
 
-    init(_ x: Int, _ y: Int) {
+    init(_ x: Float, _ y: Float) {
         self.x = x
         self.y = y
     }
 }
 struct CommandBufferTests {
 
+    // MARK: COMMANDS
     @Test("Queue command create")
     func queueCommandCreate() {
         let world = World.create()
@@ -78,6 +79,26 @@ struct CommandBufferTests {
         #expect(!posStore.has(e))
     }
 
+    // MARK: QUERIES
+
+    @Test("Query single type")
+    func query() {
+        let world = World.create()
+        let e1 = world.spawn()
+        let e2 = world.spawn()
+        let e3 = world.spawn()
+
+        _ = world.register(storeOf: Position.self)
+
+        world.queue(.addComponent(e1, Position(1, 1)))
+        world.queue(.addComponent(e2, Position(2, 3)))
+        world.queue(.addComponent(e3, Position(4, 5)))
+        world.flush()
+
+        var seen = [Float]()
+        Query.run(world, with: Position.self) { _, p in seen.append(p.x) }
+        #expect(seen.sorted() == [1, 2, 4])
+    }
 }
 
 

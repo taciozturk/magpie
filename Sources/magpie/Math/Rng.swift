@@ -5,7 +5,7 @@
 //  Created by Taci Öztürk on 28.11.2026.
 //
 
-public struct SplitMix64: RandomNumberGenerator {
+public struct Rng: RandomNumberGenerator {
     private var state: UInt64
     init(seed: UInt64) {
         state = seed
@@ -19,7 +19,7 @@ public struct SplitMix64: RandomNumberGenerator {
         return z ^ (z >> 31)
     }
 
-    public mutating func nextFloat() -> Float64 {
-        Float64(next() >> 11) * 0x1.0p-53
+    public mutating func nextFloat() -> Double {
+        Double(next() >> 11) * 0x1.0p-53
     }
 }

@@ -70,6 +70,11 @@ public final class ComponentStore<T: Component>: AnyComponentStore {
         return components[Int(sparse[Int(entity.id)])]
     }
 
+    @inline(__always)
+    package func getUnchecked(_ entity: Entity) -> T {
+        components[Int(sparse[Int(entity.id)])]
+    }
+
     // mutate the component in place while calling from world
     package func modify(_ entity: Entity, _ body: (inout T) -> Void) {
         guard has(entity) else { return }

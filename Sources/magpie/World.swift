@@ -7,6 +7,7 @@
 
 public final class World {
     package let clock = Clock()
+    package var lastRun: UInt64 = 0
     package let entities = EntityAllocator()
     package var stores: [ObjectIdentifier: any AnyComponentStore] = [:]
     package var commandBuffer = CommandBuffer()
