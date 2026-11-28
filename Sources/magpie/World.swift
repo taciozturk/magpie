@@ -23,7 +23,7 @@ public final class World {
         return e
     }
 
-    public func despawn(entity: Entity) {
+    private func despawn(entity: Entity) {
         if isAlive(entity) {
             for store in stores.values {
                 if store.has(entity) {
@@ -38,6 +38,10 @@ public final class World {
     public func isAlive(_ entity: Entity) -> Bool {
         return entities.isAlive(entity)
     }
+
+//    public func has<C: Component>(_ entity: Entity, _ componentType: C.Type) -> Bool {
+//        return store(of: C.self).has(entity)
+//    }
 
     @discardableResult
     public func register<T: Component>(storeOf componentType: T.Type) -> ComponentStore<T> {

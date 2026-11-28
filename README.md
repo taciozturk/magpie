@@ -11,13 +11,13 @@ magpie is a personal project where i try to implement a **lightweight ECS packag
 *type erased generic store*s
 #### CommandBuffer and Commands
 *delayed store commands to prevent array resizing during iteration*
-#### ****Query Engine
-*parameter pack iteration(Swift 6.0+)* 
+
+#### Queries
+*parameter pack iteration(Swift 6.0+) *
+#### System Scheduler
 
 >[!CAUTION]
 > not implemented
-#### System Scheduler
-
 
 #### EventBus and Events
 *message queue for system communication*

@@ -7,7 +7,7 @@
 
 let INVALID_SLOT = UInt32.max
 
-public protocol Component {}
+public protocol Component: Equatable, Hashable {}
 
 // AnyComponentStore conforms to AnyObject so we can downcast it to the concrete type
 // e.g. ComponentStore<T> becomes ComponentStore<Position>.

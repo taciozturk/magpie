@@ -25,7 +25,7 @@ struct QueryTests {
         world.flush()
 
         var seen = [Float]()
-        Query.run(world, with: Position.self) { _, p in seen.append(p.x) }
+        Query.run(world, with: Position.self) { _, p in seen.append(p.value.x) }
         #expect(seen.sorted() == [1, 2, 4])
     }
 }
