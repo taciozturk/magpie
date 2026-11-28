@@ -26,8 +26,6 @@ magpie is a personal project where i try to implement a **lightweight ECS packag
 
 #### Pseudorandom Number Generator (SplitMix64)
 *fast prng for seeding*
->[!CAUTION]
-> not implemented
 
 #### Vector and Matrix Ops
 *for storing and transforming component data*
