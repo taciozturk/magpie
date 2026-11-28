@@ -8,16 +8,6 @@
 import Testing
 @testable import magpie
 
-struct Position: Component {
-    var x: Float
-    var y: Float
-
-    init(_ x: Float, _ y: Float) {
-        self.x = x
-        self.y = y
-    }
-}
-
 struct CommandBufferTests {
 
     @Test("Queue command create")
@@ -58,8 +48,7 @@ struct CommandBufferTests {
         #expect(posStore.has(e))
 
         if let pos = posStore.get(e) {
-            #expect(pos.x == 1)
-            #expect(pos.y == 1)
+            #expect(pos.value == Vec2(1,1))
         }
     }
 
